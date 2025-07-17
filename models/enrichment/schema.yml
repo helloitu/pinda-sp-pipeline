@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: trf_vereadores
+    columns:
+      - name: vereador_id
+        tests:
+          - unique
+          - not_null
+
+  - name: trf_proposicoes
+    columns:
+      - name: proposicao_id
+        tests:
+          - unique
+          - not_null
+
+  - name: trf_legislacoes
+    columns:
+      - name: legislacao_id
+        tests:
+          - unique
+          - not_null
+
+  - name: trf_bairros
+    columns:
+      - name: bairro_id
+        tests:
+          - unique
+          - not_null
+
+  - name: trf_pautas
+    columns:
+      - name: pauta_id
+        tests:
+          - unique
+          - not_null
+
+  - name: trf_noticias
+    columns:
+      - name: noticia_id
+        tests:
+          - unique
+          - not_null
+
+  - name: trf_tvcamara
+    columns:
+      - name: tvcamara_id
+        tests:
+          - unique
+          - not_null
