@@ -18,6 +18,7 @@ def get_api_data(service, params=None):
 
     all_data = []
     page = 1
+    previous_page_content = None
     while True:
         time.sleep(3)
         paginated_url = f"{url}&pagina={page}"
@@ -29,14 +30,21 @@ def get_api_data(service, params=None):
             if not data or (isinstance(data, dict) and not data.get('registros')):
                 break
 
+            records = []
             if isinstance(data, dict) and data.get('registros'):
-                all_data.extend(data['registros'])
+                records = data['registros']
             elif isinstance(data, list):
-                all_data.extend(data)
+                records = data
 
-            if not data or (isinstance(data, dict) and len(data.get('registros', [])) == 0) or (isinstance(data, list) and len(data) == 0):
+            if not records:
                 break
 
+            current_page_content = json.dumps(records)
+            if current_page_content == previous_page_content:
+                break
+
+            all_data.extend(records)
+            previous_page_content = current_page_content
             page += 1
         except subprocess.CalledProcessError as e:
             print(f"Error fetching data from {paginated_url}: {e}")
@@ -76,14 +84,16 @@ def main():
         try:
             if service == "proposicoes":
                 tipos_proposicoes = get_api_data("proposicoes")
-                for tipo in tipos_proposicoes:
-                    proposicoes_por_tipo = get_api_data("proposicoes", params={"tipo": tipo['contract']})
-                    save_to_csv(proposicoes_por_tipo, f"proposicoes_{tipo['contract']}.csv")
+                if tipos_proposicoes:
+                    for tipo in tipos_proposicoes:
+                        proposicoes_por_tipo = get_api_data("proposicoes", params={"tipo": tipo['contract']})
+                        save_to_csv(proposicoes_por_tipo, f"proposicoes_{tipo['contract']}.csv")
             elif service == "legislacoes":
                 tipos_legislacoes = get_api_data("legislacoes")
-                for tipo in tipos_legislacoes:
-                    legislacoes_por_tipo = get_api_data("legislacoes", params={"tipo": tipo['contract']})
-                    save_to_csv(legislacoes_por_tipo, f"legislacoes_{tipo['contract']}.csv")
+                if tipos_legislacoes:
+                    for tipo in tipos_legislacoes:
+                        legislacoes_por_tipo = get_api_data("legislacoes", params={"tipo": tipo['contract']})
+                        save_to_csv(legislacoes_por_tipo, f"legislacoes_{tipo['contract']}.csv")
             else:
                 data = get_api_data(service)
                 save_to_csv(data, f"{service}.csv")
